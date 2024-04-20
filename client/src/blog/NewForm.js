@@ -34,12 +34,12 @@ const NewForm = () => {
     }
 
     try {
-      const response = await fetch('/add', {
+      const response = await fetch('/newarticle', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ title, content }),
+        body: JSON.stringify({ title: title, body: content }),
       });
       if (!response.ok) {
         throw new Error('HTTP error! Status: ${response.status}');

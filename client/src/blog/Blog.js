@@ -20,7 +20,7 @@ function Blog({ articles, editArticle, setArticles }) {
   // };
 
   useEffect(() => {
-    fetch(`get`)
+    fetch(`/articles`)
       .then((response) => response.json())
       .then((data) => setArticles(data))
       .catch((error) => console.error('Error fetching articles:', error));
@@ -29,7 +29,7 @@ function Blog({ articles, editArticle, setArticles }) {
   const handleEditArticle = (article) => {
     setEditedArticle(article);
     setEditedTitle(article.title);
-    setEditedContent(article.content);
+    setEditedContent(article.body);
   };
 
   const addNewArticle = () => {
@@ -41,7 +41,7 @@ function Blog({ articles, editArticle, setArticles }) {
   };
 
   const insertArticle = (newArticle) => {
-    fetch(`/add`, {
+    fetch(`/newarticle`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -53,7 +53,7 @@ function Blog({ articles, editArticle, setArticles }) {
     })
       .then((response) => {
         if (response.ok) {
-          fetch(`/get`)
+          fetch(`/articles`)
             .then((response) => response.json())
             .then((data) => setArticles(data))
             .catch((error) =>
@@ -69,7 +69,7 @@ function Blog({ articles, editArticle, setArticles }) {
   };
 
   const deleteArticle = (articleId) => {
-    fetch(`/delete/${articleId}`, {
+    fetch(`/article/${articleId}`, {
       method: 'DELETE',
     })
       .then((response) => {
@@ -94,10 +94,10 @@ function Blog({ articles, editArticle, setArticles }) {
       const updatedArticle = {
         id: editedArticle.id,
         title: editedTitle,
-        content: editedContent,
+        body: editedContent,
       };
 
-      fetch(`/update/${editedArticle.id}`, {
+      fetch(`/articleupdate/${editedArticle.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -109,7 +109,7 @@ function Blog({ articles, editArticle, setArticles }) {
             setEditedArticle(null);
             setEditedTitle('');
             setEditedContent('');
-            fetch('/get')
+            fetch('/articles')
               .then((response) => response.json())
               .then((data) => setArticles(data))
               .catch((error) =>
@@ -149,7 +149,7 @@ function Blog({ articles, editArticle, setArticles }) {
               <Link to={`/article/${article.id}`}>{article.title} </Link>
               </h2>
             <p className="paragraph">
-              <Link to={`/article/${article.id}`}>{article.content}</Link>
+              <Link to={`/article/${article.id}`}>{article.body}</Link>
               </p>
             {/* <div>
                 <button
@@ -162,7 +162,7 @@ function Blog({ articles, editArticle, setArticles }) {
 
             <div style={{paddingBottom: 15, justifyContent: 'right', alignContent: 'right'}}>
               <button
-                class="editbtn"
+                className="editbtn"
                 onClick={() => handleEditArticle(article)}
               >
                 <FaEdit/>
@@ -182,7 +182,7 @@ function Blog({ articles, editArticle, setArticles }) {
         {editedArticle && (
           <Form
             title={editedTitle}
-            content={editedContent}
+            body={editedContent}
             setTitle={setEditedTitle}
             setContent={setEditedContent}
             updateArticle={updateArticle}
@@ -192,7 +192,7 @@ function Blog({ articles, editArticle, setArticles }) {
         {isAddingNewArticle && (
           <NewForm
             title={editedTitle}
-            content={editedContent}
+            body={editedContent}
             setTitle={setEditedTitle}
             setContent={setEditedContent}
             insertArticle={insertArticle}

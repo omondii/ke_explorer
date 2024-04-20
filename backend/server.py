@@ -1,91 +1,127 @@
-from flask import Flask, jsonify, request
-from flask_sqlalchemy import SQLAlchemy
-import datetime
-from flask_marshmallow import Marshmallow
+#!/usr/bin/env python3
+"""
+Flask backend for ExploreKe
+Imported packages;
+Flask
+"""
+from flask import Flask, jsonify, request, abort, make_response, render_template
+import time
+from models.tables import User, Article, Categories, Comments
 from flask_cors import CORS
+from models import storage
+from datetime import datetime
 
 app = Flask(__name__)
-CORS(app)
+cors = CORS(app)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://devbrian:exploreKe_pwd@localhost/exploreKe'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-db = SQLAlchemy(app)
-ma = Marshmallow(app)
-
-class Article(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(100))
-    content = db.Column(db.Text())
-    postDate = db.Column(db.DateTime, default = datetime.datetime.now)
-
-    def __init__(self, title, content):
-        self.title = title
-        self.content = content
-
-    @property
-    def formatted_date(self):
-        return self.postDate.strftime("%b %d %Y")
-    @property
-    def new_date(self):
-        return self.postDate.strftime("%b %d")
-
-class ArticleSchema(ma.Schema):
-    class Meta:
-        fields = ('id', 'title', 'content', 'postDate', 'formatted_date', 'new_date')
-
-
-
-article_schema = ArticleSchema()
-articles_schema = ArticleSchema(many=True)
-
-
-@app.route('/get', methods = ['GET'])
+# Article routes - CRUD operations for article operations
+@app.route("/articles", methods=["GET"],strict_slashes=False)
 def get_articles():
-    all_articles = Article.query.all()
-    results = articles_schema.dump(all_articles)
-    return jsonify(results)
+   """ Retrieve a list of all articles """
+   blogs = storage.all(Article).values()
+   result = [blog.to_dict() for blog in blogs]
+   return jsonify(result)
 
-@app.route('/article/<id>/', methods = ['GET'])
+@app.route("/article/<id>", methods=['GET'], strict_slashes=False)
 def get_article(id):
-    article = Article.query.get(id)
-    return article_schema.jsonify(article)
+   """ Returns the article of the given id """
+   article = storage.get(Article, id)
+   if not article:
+      abort(404)
+   return jsonify(article.to_dict())
 
-@app.route('/add', methods = ['POST'])
-def add_article():
-    try:
-        title = request.json['title']
-        content = request.json['content']
-        articles = Article(title, content)
-        db.session.add(articles)
-        db.session.commit()
-        return article_schema.jsonify(articles), 201
-    except KeyError as e:
-        return jsonify({"error": f"Missing key in JSON: {e}"}), 400
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+@app.route('/newarticle', methods=['POST'], strict_slashes=False)
+def post_article():
+   """ Add a new article to the db """
+   data = request.get_json()
 
-@app.route('/update/<id>', methods = ['PUT'])
-def update_articles(id):
-    article = Article.query.get(id)
-    title = request.json['title']
-    content = request.json['content']
+   if 'title' not in data or 'body' not in data:
+      return jsonify({"error": "Missing 'title' or 'body' in request data"}), 400
+   
+   title = data['title']
+   body = data['body']
+   author_id = data.get('author_id', None)
+   category_id = data.get('category_id', None)
+   articles = Article(
+      title=title,
+      body=body,
+      author_id=author_id,
+      category_id=category_id,
+      created_at=datetime.now(),
+      updated_at=datetime.now()
+   )
+   storage.new(articles)
+   storage.save()
+   return jsonify({"message": "Article Successfully Posted"}), 201
 
-    article.title = title
-    article.content = content
+@app.route('/articleupdate/<id>', methods=['PUT'], strict_slashes=False)
+def update_article(id):
+   """ Updates an article """
+   article = storage.get(Article, id)
 
-    db.session.commit()
-    return article_schema.jsonify(article)
+   data = request.get_json()
+   if not data:
+      abort(400, description="Not a JSON")
 
-@app.route('/delete/<id>', methods = ['DELETE'])
+   ignore = ['id', 'author_id', 'category_id', 'created_at']
+   for key, value in data.items():
+      if key not in ignore:
+         setattr(article, key, value)
+   article.updated_at = datetime.now()
+
+   if 'body' in data:
+      article.body = data['body']
+
+   storage.save()
+   return make_response(jsonify(article.to_dict()), 200)
+
+@app.route('/article/<id>', methods=['DELETE'], strict_slashes=False)
 def delete_article(id):
-    article = Article.query.get(id)
-    db.session.delete(article)
-    db.session.commit()
-    return article_schema.jsonify(article)
+   """ Deletes an article of corresponding id """
+   article = storage.get(Article, id)
+   if not article:
+      abort(404)
+   storage.delete(article)
+   storage.save()
+
+   return make_response(jsonify({}), 200)
+
+# User, comments routes
+@app.route('/users', methods=['GET'], strict_slashes=False)
+def get_users():
+   """ Returns a list of all users """
+   users = storage.all(User).values()
+   result = [user.to_dict() for user in users]
+   return jsonify(result)
+
+@app.route('/user/<id>', methods=['GET'], strict_slashes=False)
+def get_user(id):
+   """ Returns User of given id """
+   user = storage.get(User, id)
+   if not user:
+      abort(404)
+   return jsonify(user)
+
+@app.route('/adduser', methods=['POST'], strict_slashes=False)
+def create_user():
+   """ Creates a new User """
+   data = request.get_json()
+
+   if 'name' not in data or 'email' not in data:
+      return jsonify({"error": "Missing requirement! Check your details and try again"})
+   
+   name = data['name']
+   email = data['email']
+
+   user = User(
+      name=name,
+      email=email
+   )
+
+   storage.new(user)
+   storage.save()
+   return jsonify({"message": "User Created successfully"})
+
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
     app.run(debug=True)

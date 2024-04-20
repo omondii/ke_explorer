@@ -6,7 +6,7 @@ function HelperComponent() {
     const[content, setContent] = useState('');
 
     const insertArticle = async (article) => {
-        const response = await fetch(`/add`, {
+        const response = await fetch(`/newarticle`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -20,7 +20,7 @@ function HelperComponent() {
     return (
         <NewForm
         title={title}
-        content={content}
+        body={content}
         setTitle={setTitle}
         setContent={setContent}
         insertArticle={insertArticle}

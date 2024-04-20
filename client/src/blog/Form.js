@@ -1,6 +1,6 @@
 import React from 'react';
 
-function Form({ title, content, setTitle, setContent, updateArticle}) {
+function Form({ title, body, setTitle, setContent, updateArticle}) {
   const handleTitleChange = (e) => {
     setTitle(e.target.value);
   };
@@ -20,7 +20,7 @@ function Form({ title, content, setTitle, setContent, updateArticle}) {
       />
       <textarea
         className="w-full border rounded p-2"
-        value={content}
+        value={body}
         onChange={handleContentChange}
         placeholder="Content"
       />

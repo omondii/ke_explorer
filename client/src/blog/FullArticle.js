@@ -26,7 +26,7 @@ function FullArticle() {
               <p style={{paddingLeft: '10px'}}>{article.new_date}</p>
               </div>
         <h1 style={{fontSize:'20px', fontWeight: 'bold'}}>{article.title}</h1>
-        <p className="singleParagraph">{article.content}</p>
+        <p className="singleParagraph">{article.body}</p>
         {/* <div style={{paddingBottom: 15, justifyContent: 'right', alignContent: 'right'}}>
               <button
                 class="editbtn"
