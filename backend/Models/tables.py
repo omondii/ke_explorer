@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """ Database schema for ExploreKe """
-from models.base_model import BaseModel, Base
+from Models.base_model import BaseModel, Base
 from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, func
 from sqlalchemy.orm import relationship
 
@@ -9,19 +9,11 @@ class User(BaseModel, Base):
     """ Users Table  """
     __tablename__ = "user"
     id = Column(String(60), primary_key=True)
-    name = Column(String(60), nullable=False)
+    username = Column(String(60), nullable=False)
     email = Column(String(60), unique=True, nullable=False)
+    password_hash = Column(String(128))
     articles = relationship("Article", back_populates="author")
     comments = relationship("Comments", back_populates="commenter")
-
-
-class Categories(BaseModel, Base):
-    """ Categories Table """
-    __tablename__ = "category"
-    id = Column(String(60), primary_key=True)
-    category = Column(String(60))
-    articles = relationship("Article", back_populates="category")
-
 
 class Article(BaseModel, Base):
     """ Articles/posts database """
@@ -35,7 +27,6 @@ class Article(BaseModel, Base):
     category_id = Column(String(60), ForeignKey('category.id'))
     comments = relationship("Comments", back_populates="article")
 
-
 class Comments(BaseModel, Base):
     """ Comments Table """
     __tablename__ = "comment"
@@ -46,6 +37,13 @@ class Comments(BaseModel, Base):
     commenter = relationship("User", back_populates="comments")
     article_id = Column(String(60), ForeignKey('article.id'))
     article = relationship("Article", back_populates="comments")
+
+class Categories(BaseModel, Base):
+    """ Categories Table """
+    __tablename__ = "category"
+    id = Column(String(60), primary_key=True)
+    category = Column(String(60))
+    articles = relationship("Article", back_populates="category")
 
 
 # Work on  relationships(backref, back_populate)

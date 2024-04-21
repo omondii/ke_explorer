@@ -1,29 +1,31 @@
 #!/usr/bin/python3
-"""" Database management configuration """
-import models
-from models import tables, base_model
-import sqlalchemy
+"""" Database Creation and management methods
+Table must be imported and added to classes dict
+"""
+import Models
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
-from models.tables import User, Categories, Comments, Article
-from models.base_model import BaseModel, Base
+from Models.tables import User, Categories, Comments, Article
+from Models.base_model import Base
 
 
 classes = {"User": User, "Categories": Categories,
            "Article": Article, "Comments": Comments}
 
 class DBStorage:
-    """ Creates the connection to MySql """
+    """ Creates a connection to application's MySql db """
     __engine = None
     __session = None
 
     def __init__(self):
-        """ Instantiate a DBstorage object """
+        """ Instantiates the DBstorage class
+        Handles db setup and common db operations"""
         self.__engine = create_engine("mysql+mysqldb://devbrian:exploreKe_pwd@localhost/exploreKe_db",
                                       pool_pre_ping=True)
         
     def all(self, cls=None):
-        """ Query the current db session """
+        """ Query the current db session for all items of a table
+        returns a dict containing all items in the corresponding table """
         new_dict = {}
         for clss in classes:
             if cls is None or cls is classes[clss] or cls is clss:
@@ -54,14 +56,11 @@ class DBStorage:
             self.__session.delete(obj)
 
     def get(self, cls, id):
-        """
-        Returns the object based on the class name and its ID, or
-        None if not found
-        """
+        """ Returns the object based on the class name and its ID """
         if cls not in classes.values():
             return None
 
-        all_cls = models.storage.all(cls)
+        all_cls = Models.storage.all(cls)
         for value in all_cls.values():
             if (value.id == id):
                 return value
@@ -69,5 +68,5 @@ class DBStorage:
         return None
     
     def close(self):
-        """call remove() method on the private session attribute"""
+        """ call remove() method on the private session attribute """
         self.__session.remove()
