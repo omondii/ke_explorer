@@ -3,7 +3,7 @@
 from flask import Flask, jsonify, request, abort, make_response, render_template
 import time
 from Models.tables import User, Article, Categories, Comments
-from flask_cors import CORS
+from flask_cors import CORS # type: ignore
 from Models import storage
 from datetime import datetime
 from Routes import app_views

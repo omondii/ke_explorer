@@ -1,16 +1,23 @@
 #!/usr/bin/env python3
 """ Application entry point from flask import Flask """
 from flask import Flask
-from flask_cors import CORS
-#from config import Config
-from flask_login import LoginManager
+from flask_cors import CORS # type: ignore
+from config import Config
+from flask_login import LoginManager # type: ignore
+from flask_jwt_extended import JWTManager  # type: ignore
+from datetime import datetime, timedelta, timezone
 
+
+app = None
 def create_app():
+    global app
     app = Flask(__name__)
     CORS(app, resources={'r/backend/*': {'origins': 'http://localhost:5000'}})
-    #app.config.from_object(Config)
-    login = LoginManager(app)
-
+    app.config.from_object(Config)
+    app.config["JWT_SECRET_KEY"] = "Change"
+    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
+    JWTManager(app)
+    
     # Register Blueprints
     from Auth import auth
     app.register_blueprint(auth)
@@ -21,5 +28,5 @@ def create_app():
     return app
 
 if __name__ == '__main__':
-    app = create_app()
+    create_app()
     app.run(debug=True)

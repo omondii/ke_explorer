@@ -2,6 +2,9 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 function NavBar(){
+    function logMeOut() {
+        
+    }
     return(
         <div className='h-[4rem] bg-black text-white flex w-full items-center justify-between'>
             <div className='flex justify-center p-10'>
@@ -17,7 +20,7 @@ function NavBar(){
             </div>
     
             <div className='flex items-center p-10'>
-            <p className='cursor-pointer font-medium hover:text-green-300'><Link to="#">SignUp/LogIn</Link></p>
+            <p className='cursor-pointer font-medium hover:text-green-300'><Link to="/login">LogIn</Link></p>
             </div>
         </div>
         )

@@ -8,9 +8,14 @@ import Blog from './blog/Blog';
 import Contact from './contact/Contact';
 import FullArticle from './blog/FullArticle';
 import NewForm from './blog/NewForm';
+import useToken from './login/useToken';
+import Login from './login/Login';
+import Profile from './profile/Profile';
+
 
 function App() {
   const [articles, setArticles] = useState([]);
+  const { token, removeToken, setToken} = useToken();
 
   useEffect(() => {
     fetch('http://127.0.0.1:5000/get', {
@@ -27,7 +32,7 @@ function App() {
   return (
     <BrowserRouter>
       <div>
-        <NavBar />
+        <NavBar/>
       </div>
 
       <Routes>
@@ -40,6 +45,13 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/article/:articleId" element={<FullArticle/>} />
         <Route path="/new-article" element={<NewForm />}/>
+        {!token ? (
+          <Route path="/login" element={<Login setToken={setToken} />} />
+        ) : (
+          <>
+          <Route path="/profile" element={<Profile token={token} setToken={setToken}/>}/>
+          </>
+        )}
       </Routes>
     </BrowserRouter>
   );

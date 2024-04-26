@@ -3,9 +3,14 @@
 from Models.base_model import BaseModel, Base
 from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, func
 from sqlalchemy.orm import relationship
+from flask_login import UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import LoginManager
+from server import app
 
 
-class User(BaseModel, Base):
+login = LoginManager(app)
+class User(BaseModel, Base, UserMixin):
     """ Users Table  """
     __tablename__ = "user"
     id = Column(String(60), primary_key=True)
@@ -14,6 +19,22 @@ class User(BaseModel, Base):
     password_hash = Column(String(128))
     articles = relationship("Article", back_populates="author")
     comments = relationship("Comments", back_populates="commenter")
+
+    def __repr__(self):
+        """ Format to return user details """
+        return '<user {}>'.format(self.username)
+    
+    def set_password(self, password):
+        """ Encrypt password field """
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        """ Check if password is encrypted """
+        return check_password_hash(self.password_hash, password)
+    
+@login.user_loader
+def load_user(id):
+    return User.query.get(int(id))
 
 class Article(BaseModel, Base):
     """ Articles/posts database """
