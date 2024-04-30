@@ -3,3 +3,4 @@ ExploreKe.code-workspace
 venv
 __pycache__
 .env
+node_modules
