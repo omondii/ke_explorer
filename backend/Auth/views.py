@@ -48,7 +48,7 @@ def my_profile():
     """ Contains currently logged in users profile details """
     response_body = {
         "name": "Brian",
-        "about": "Welcome To ExporeKe"
+        "about": "Welcome To ExploreKe"
     }
     return response_body
 

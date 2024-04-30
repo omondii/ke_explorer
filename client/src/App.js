@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes} from 'react-router-dom';
+import Switch from 'react-router-dom';
 import Home from './home/Home';
 import About from './about/About';
 import NavBar from './navbar/Navbar';
@@ -11,6 +12,7 @@ import NewForm from './blog/NewForm';
 import useToken from './login/useToken';
 import Login from './login/Login';
 import Profile from './profile/Profile';
+import Signup from  './login/Signup';
 
 
 function App() {
@@ -36,6 +38,16 @@ function App() {
       </div>
 
       <Routes>
+        <Switch>
+          <Route path="/sigup" exact Component={Signup} />
+          {!token ? (
+            <Route path="/login" element={<Login setToken={setToken} />} />
+          ) : (
+            <>
+            <Route path="/profile" element={<Profile token={token} setToken={setToken}/>}/>
+            </>
+          )}
+        </Switch>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route
@@ -45,13 +57,6 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/article/:articleId" element={<FullArticle/>} />
         <Route path="/new-article" element={<NewForm />}/>
-        {!token ? (
-          <Route path="/login" element={<Login setToken={setToken} />} />
-        ) : (
-          <>
-          <Route path="/profile" element={<Profile token={token} setToken={setToken}/>}/>
-          </>
-        )}
       </Routes>
     </BrowserRouter>
   );

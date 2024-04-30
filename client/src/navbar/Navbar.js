@@ -1,9 +1,19 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-function NavBar(){
+function NavBar(props){
     function logMeOut() {
-        
+        fetch('/logout', {
+            method: "POST",
+        }).then((response) => {
+            props.token()
+        }).catch((error) => {
+            if (error.response) {
+                console.log(error.response)
+                console.log(error.response.status)
+                console.log(error.response.headers)
+            }
+        })
     }
     return(
         <div className='h-[4rem] bg-black text-white flex w-full items-center justify-between'>

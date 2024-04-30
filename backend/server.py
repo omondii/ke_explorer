@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """ Application entry point from flask import Flask """
+import os
 from flask import Flask
 from flask_cors import CORS # type: ignore
 from config import Config
@@ -14,7 +15,7 @@ def create_app():
     app = Flask(__name__)
     CORS(app, resources={'r/backend/*': {'origins': 'http://localhost:5000'}})
     app.config.from_object(Config)
-    app.config["JWT_SECRET_KEY"] = "Change"
+    app.secret_key = os.environ.get('JWT_SECRET_KEY')
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
     JWTManager(app)
     
