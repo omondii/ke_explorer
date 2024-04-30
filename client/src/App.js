@@ -38,8 +38,7 @@ function App() {
       </div>
 
       <Routes>
-        <Switch>
-          <Route path="/sigup" exact Component={Signup} />
+          <Route path="/signup" exact Component={Signup} />
           {!token ? (
             <Route path="/login" element={<Login setToken={setToken} />} />
           ) : (
@@ -47,7 +46,7 @@ function App() {
             <Route path="/profile" element={<Profile token={token} setToken={setToken}/>}/>
             </>
           )}
-        </Switch>
+
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route

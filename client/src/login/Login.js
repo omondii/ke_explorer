@@ -37,6 +37,10 @@ function Login(props) {
             ...prevNote, [name]: value})
         )}
     
+    function logMeOut(){
+        props.setToken("");
+    }
+
     return (
         <div>
             <h1>Login</h1>
@@ -61,6 +65,7 @@ function Login(props) {
                     Logout
                 </button>
            </header>
+           <p>Don't have an Account? <a href="/login">SignUp</a></p>
         </div>
     );
 }
