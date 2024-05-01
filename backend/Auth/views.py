@@ -8,6 +8,8 @@ from Auth import auth
 from flask_jwt_extended import create_access_token, unset_jwt_cookies, \
     get_jwt, get_jwt_identity, jwt_required
 from datetime import datetime, timezone, timedelta
+from Models import storage
+from Models.tables import User, Article, Categories, Comments
 
 
 
@@ -41,6 +43,32 @@ def create_token():
     access_token = create_access_token(identity=email)
     response = {"access_token": access_token}
     return response
+
+@auth.route('/signup', methods=['POST'])
+def signup():
+    """ Adds user details to the database """
+    data = request.json
+
+    username = data.get('username')
+    email = data.get('email')
+    password = data.get('password')
+
+    existing_user = storage.get(User, username)
+    if existing_user:
+        return jsonify({'message': 'Username already exists'}), 400
+    existing_email = storage.get(User, email)
+    if existing_email:
+        return jsonify({'message': 'Username already exists'}), 400
+    
+    user = User(
+        username=username,
+        email=email,
+        password=password
+    )
+    user.set_password(password)
+    storage.new(user)
+    return jsonify({'message': 'User registered'}), 200
+
 
 @auth.route('/profile')
 @jwt_required()

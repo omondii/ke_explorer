@@ -16,7 +16,7 @@ class User(BaseModel, Base, UserMixin):
     id = Column(String(60), primary_key=True)
     username = Column(String(60), nullable=False)
     email = Column(String(60), unique=True, nullable=False)
-    password_hash = Column(String(128))
+    password = Column(String(128))
     articles = relationship("Article", back_populates="author")
     comments = relationship("Comments", back_populates="commenter")
 

@@ -65,7 +65,7 @@ function Login(props) {
                     Logout
                 </button>
            </header>
-           <p>Don't have an Account? <a href="/login">SignUp</a></p>
+           <p>Don't have an Account? <a href="/signup">SignUp</a></p>
         </div>
     );
 }
