@@ -2,7 +2,7 @@
 ## A Blog website for campers, tourists and explorers to post articles and photos of good camping locations around Kenya. Users can create and delete accounts, post and bookmark other users posts. 
 
 
-## Pre-Requisites
+# Pre-Requisites
 1. Python installed
 2. Nodejs installed
 
@@ -16,7 +16,7 @@
 3. Start both the frontend and backend.
 
 A. Client
-   - Open the terminal and navigate to the `/client` folder
+   - Open the terminal and navigate to the frontend folder
    `cd client` 
    - install the required packages
    `npm install`
@@ -24,7 +24,7 @@ A. Client
    `npm run start`
 
 B. server
-   - On the terminal, navigate to the `/backend` folder
+   - On the terminal, navigate to the backend folder
    `cd backend`
    - Create and activate a virtual environment
    ```
@@ -39,3 +39,6 @@ B. server
    `./server`
 
 4. Visit http://localhost:3000/
+
+>[!IMPORTANT]
+>Not all of the mentioned functionalities have been fully implemented. This project is still in active development.
