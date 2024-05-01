@@ -1,6 +1,11 @@
 # Exploreke
 ## A Blog website for campers, tourists and explorers to post articles and photos of good camping locations around Kenya. Users can create and delete accounts, post and bookmark other users posts. 
 
+
+## Pre-Requisites
+1. Python installed
+2. Nodejs installed
+
 # Installation
 1. Clone the repository in your desired folder, the dot(.) is to ensure you don't replicate the repos name
 `git clone https://https://github.com/omondii/ExploreKE.git .`
@@ -9,6 +14,7 @@
 `cd ExploreKE`
 
 3. Start both the frontend and backend.
+
 A. Client
    - Open the terminal and navigate to the `/client` folder
    `cd client` 
