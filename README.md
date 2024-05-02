@@ -33,7 +33,7 @@ B. server
    # activate it
    source venv/bin/activate
    ```
-   - install project dependancies
+   - install project dependencies
    `pip install -r requirements.txt`
    - Start the backend development server
    `./server`
