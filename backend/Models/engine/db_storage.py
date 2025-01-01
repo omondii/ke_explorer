@@ -2,11 +2,16 @@
 """" Database Creation and management methods
 Table must be imported and added to classes dict
 """
+import os
 import Models
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from Models.tables import User, Categories, Comments, Article
 from Models.base_model import Base
+from dotenv import load_dotenv
+
+load_dotenv()
+DB_URL = os.getenv('DATABASE_URL')
 
 
 classes = {"User": User, "Categories": Categories,
@@ -20,8 +25,7 @@ class DBStorage:
     def __init__(self):
         """ Instantiates the DBstorage class
         Handles db setup and common db operations"""
-        self.__engine = create_engine("mysql+mysqldb://devbrian:exploreKe_pwd@localhost/exploreKe_db",
-                                      pool_pre_ping=True)
+        self.__engine = create_engine(DB_URL, pool_pre_ping=True)
         
     def all(self, cls=None):
         """ Query the current db session for all items of a table
@@ -66,7 +70,26 @@ class DBStorage:
                 return value
 
         return None
+
+    def get_by_email(self, cls, email):
+        """Returns the object based on the class and email"""
+        if cls not in classes.values():
+            return None
+
+        all_cls = self.all(cls)
+        for value in all_cls.values():
+            if value.email == email:
+                return value
+        return None
+
+    def rollback(self):
+        """
+        Reverts changes made i the current session to the last commited state
+        :return:
+        """
+        self.__session.rollback()
     
     def close(self):
         """ call remove() method on the private session attribute """
         self.__session.remove()
+

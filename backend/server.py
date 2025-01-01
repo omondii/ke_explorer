@@ -2,10 +2,10 @@
 """ Application entry point from flask import Flask """
 import os
 from flask import Flask
-from flask_cors import CORS # type: ignore
+from flask_cors import CORS
 from config import Config
-from flask_login import LoginManager # type: ignore
-from flask_jwt_extended import JWTManager  # type: ignore
+from flask_login import LoginManager
+from flask_jwt_extended import JWTManager
 from datetime import datetime, timedelta, timezone
 
 
@@ -18,6 +18,7 @@ def create_app():
     app.secret_key = os.environ.get('JWT_SECRET_KEY')
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
     JWTManager(app)
+
     
     # Register Blueprints
     from Auth import auth
@@ -28,6 +29,8 @@ def create_app():
 
     return app
 
+
 if __name__ == '__main__':
     create_app()
     app.run(debug=True)
+

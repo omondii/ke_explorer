@@ -81,38 +81,3 @@ def delete_article(id):
 
    return make_response(jsonify({}), 200)
 
-# User, comments routes
-@app_views.route('/users', methods=['GET'], strict_slashes=False)
-def get_users():
-   """ Returns a list of all users """
-   users = storage.all(User).values()
-   result = [user.to_dict() for user in users]
-   return jsonify(result)
-
-@app_views.route('/user/<id>', methods=['GET'], strict_slashes=False)
-def get_user(id):
-   """ Returns User of given id """
-   user = storage.get(User, id)
-   if not user:
-      abort(404)
-   return jsonify(user)
-
-@app_views.route('/adduser', methods=['POST'], strict_slashes=False)
-def create_user():
-   """ Creates a new User """
-   data = request.get_json()
-
-   if 'name' not in data or 'email' not in data:
-      return jsonify({"error": "Missing requirement! Check your details and try again"})
-   
-   name = data['name']
-   email = data['email']
-
-   user = User(
-      name=name,
-      email=email
-   )
-
-   storage.new(user)
-   storage.save()
-   return jsonify({"message": "User Created successfully"})

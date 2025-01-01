@@ -1,89 +1,125 @@
 #!/usr/bin/env python3
-""" View functions for user authentication 
-Flask jwt module used"""
-import json
-from flask import jsonify, request
-from server import app
+"""
+User Profile creation and management backend
+"""
+from flask import request, jsonify
 from Auth import auth
-from flask_jwt_extended import create_access_token, unset_jwt_cookies, \
-    get_jwt, get_jwt_identity, jwt_required
-from datetime import datetime, timezone, timedelta
 from Models import storage
-from Models.tables import User, Article, Categories, Comments
+from .utils import generate_token
+import uuid
+from Models.tables import User
+from werkzeug.security import check_password_hash
 
 
+@auth.route('/register', methods=['POST'])
+def register():
+    """Create a new user"""
+    if request.method == 'POST':
+        try:
+            data = request.get_json()
 
-@auth.after_request
-def refresh_expiring_jwts(response):
-    """ Prevents token expiration while user is logged in
-    Will refresh the tokens once the set Expiry is achieved"""
-    try:
-        exp_timestamp = get_jwt()["exp"]
-        now = datetime.now(timezone.utc)
-        target_timestamp = datetime.timestamp(now + timedelta(minutes=30))
-        if target_timestamp > exp_timestamp:
-            access_token = create_access_token(identity=get_jwt_identity())
-            data = response.get_json()
-            if type(data) is dict:
-                data['access_token'] = access_token
-                response.data = json.dumps(data)
-        return response
-    except (RuntimeError, KeyError):
-        return response
+            name = data.get('username')
+            email = data.get('email')
+            password = data.get('password')
 
-@auth.route('/token', methods=['POST'])
-def create_token():
-    """ Extracts user email and password upon a login attempt
-    If the details are correct, a jwt access token is created """
-    email = request.json.get("email", None)
-    password = request.json.get("password", None)
-    if email != "test" or password != "test":
-        return {"msg": "Wrong Email or Password"}, 401
-    
-    access_token = create_access_token(identity=email)
-    response = {"access_token": access_token}
-    return response
+            # Validate input
+            if not all([name, email, password]):
+                return jsonify({
+                    "status": "Bad Request",  
+                    "message": "Missing Fields",  
+                    "statusCode": 400
+                }), 400
 
-@auth.route('/signup', methods=['POST'])
-def signup():
-    """ Adds user details to the database """
-    data = request.json
+            # Check if user already registered
+            existing_user = storage.get_by_email(User, email)
+            if existing_user:
+                return jsonify({
+                    "status": "Conflict",
+                    "message": "User already Exists",
+                    "statusCode": 409
+                }), 409
 
-    username = data.get('username')
+            # New user instance to save user to DB
+            user = User(
+                id=str(uuid.uuid4()),
+                username=name,
+                email=email,
+                password=password
+            )
+            storage.new(user)
+            storage.save()
+            access_token = generate_token(user.id)
+            
+            return jsonify({
+                "status": "success",
+                "message": "Registration successful",
+                "statusCode": 201,
+                "data": {
+                    "accessToken": access_token,
+                    "user": {
+                        "userId": user.id,
+                        "username": user.username,
+                        "email": user.email,
+                    }
+                }
+            }), 201
+
+        except Exception as e:
+            storage.rollback()
+            return jsonify({
+                "status": "Bad request",
+                "message": str(e),
+                "statusCode": 400
+            }), 400
+
+    return jsonify({
+        "status": "Bad request",
+        "message": "Invalid request",
+        "statusCode": 401
+    }), 401
+
+
+@auth.route('/login', methods=['POST'])
+def login():
+    """ User system login
+    """
+    data = request.get_json()
+
     email = data.get('email')
     password = data.get('password')
 
-    existing_user = storage.get(User, username)
-    if existing_user:
-        return jsonify({'message': 'Username already exists'}), 400
-    existing_email = storage.get(User, email)
-    if existing_email:
-        return jsonify({'message': 'Username already exists'}), 400
-    
-    user = User(
-        username=username,
-        email=email,
-        password=password
-    )
-    user.set_password(password)
-    storage.new(user)
-    return jsonify({'message': 'User registered'}), 200
+    # Check for missing input
+    if not all([email, password]):
+      return jsonify({
+        "status": "Bad Request",
+        "message": "Missing a field",
+        "StatusCode": 400
+      }), 400
 
+    # Retrieve user
+    user = storage.get_by_email(User, email)
+      
+    if user and check_password_hash(user.password, password):
+      # Create access token
+      # access_token = generate_token(user.id)
+      
+      return jsonify({
+          "status": "Success",
+          "message": "Login Successful",
+          "statusCode": 200,
+          "data": {
+              "accessToken": access_token,
+              "user": {
+                  "userId": user.id,
+                  "username": user.username,
+                  "email": user.email,
+              }
+          }
+      }), 200
+    else:
+         return jsonify({
+          "status": "Unauthorized",
+          "message": "Authentication failed",
+          "statusCode": 401
+      }), 401
 
-@auth.route('/profile')
-@jwt_required()
-def my_profile():
-    """ Contains currently logged in users profile details """
-    response_body = {
-        "name": "Brian",
-        "about": "Welcome To ExploreKe"
-    }
-    return response_body
-
-@auth.route('/logout', methods=['POST'])
-def logout():
-    """ When a logout request is submitted, the unset..cookies deletes
-    the cookies containing the access token"""
-    response = jsonify({"msg": "Logged Out!"})
-    unset_jwt_cookies(response)
-    return response

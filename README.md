@@ -8,7 +8,7 @@
 
 # Installation
 1. Clone the repository in your desired folder, the dot(.) is to ensure you don't replicate the repos name
-`git clone https://https://github.com/omondii/ExploreKE.git .`
+`git clone https://github.com/omondii/ExploreKE.git .`
 
 2. Change to the cloned repository
 `cd ExploreKE`
