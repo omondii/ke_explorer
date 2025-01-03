@@ -8,6 +8,7 @@ from flask import current_app
 class BaseExceptionHandler(Exception):
     statusCode = None
     message = None
+    error_code = None
 
     def __init__(self, public=None, debug=None, details=None):
         self.public = public
@@ -23,7 +24,7 @@ class BaseExceptionHandler(Exception):
         return {"error": self.public}
 
     def _log(self):
-        if self.debug in None:
+        if self.debug is None:
             return
 
         if isinstance(self.debug, list):
