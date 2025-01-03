@@ -7,6 +7,7 @@ from config import Config
 from flask_login import LoginManager
 from flask_jwt_extended import JWTManager
 from datetime import datetime, timedelta, timezone
+from Routes.Errors.errorHandler import error_handler
 
 
 app = None
@@ -19,7 +20,9 @@ def create_app():
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
     JWTManager(app)
 
-    
+    # Register error handler library
+    app.errorhandler(Exception)(error_handler)
+
     # Register Blueprints
     from Auth import auth
     app.register_blueprint(auth)
