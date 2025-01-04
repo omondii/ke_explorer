@@ -2,7 +2,9 @@
 """
 A custom exseption handler class that inherits from pythons Exception class
 """
+from http import HTTPStatus
 from flask import current_app
+from flask import jsonify
 
 
 class BaseExceptionHandler(Exception):
@@ -18,10 +20,11 @@ class BaseExceptionHandler(Exception):
 
     @property
     def errors(self):
-        if self.public is None:
-            return {"error": self.public_message}
-
-        return {"error": self.public}
+        return {
+            "message": self.public or self.default_message,
+            "status": HTTPStatus(self.statusCode).phrase,
+            "statusCode": self.statusCode
+        }
 
     def _log(self):
         if self.debug is None:
@@ -35,4 +38,24 @@ class BaseExceptionHandler(Exception):
             current_app.logger.debug(f"{type(self).__name__} - {str(self.debug)}")
         else:
             current_app.logger.debug(f"{type(self).__name__} - {str(self.debug)}")
+
+
+class BaseSuccessHandler(Exception):
+    statusCode = None
+    default_message = None
+    code = None
+
+    def __init__(self, public=None, debug=None, details=None):
+        self.public = public
+        self.debug = debug
+        self.details = details
+
+    @property
+    def response(self):
+        return jsonify({
+            "status": "success",
+            "message": self.default_message,
+            "statusCode": self.statusCode,
+            "data": self.details
+        })
 

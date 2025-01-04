@@ -9,7 +9,7 @@ from .utils import generate_token
 import uuid
 from Models.tables import User
 from werkzeug.security import check_password_hash
-from Routes.Errors.responses.errors import ErrorResponseFactory
+from Routes.Errors.responses.errors import ResponseFactory
 
 
 @auth.route('/register', methods=['POST'])
@@ -25,23 +25,28 @@ def register():
 
             # Validate input
             if not all([name, email, password]):
-                return jsonify({
-                    "status": "Bad Request",
-                    "message": "Missing Fields",
-                    "statusCode": 400
-                }), 400
+                raise ResponseFactory.validation_error(
+                    resource="User",
+                    debug={
+                        "email": email,
+                        "name": name
+                    },
+                    details = "Missing a required Field"
+                )
 
             # Check if user already registered
             existing_user = storage.get_by_email(User, email)
             if existing_user:
-                raise ErrorResponseFactory.user_exists_error(
+                raise ResponseFactory.user_exists_error(
                     resource = "User",
+                    public="Kindly Check your details and try again",
                     debug={
                         "email": email,
                         "user_id": existing_user.id
                     },
-                    details="A user with this email address is already registered"
+                    details="Email already in use"
                 )
+
             # New user instance to save user to DB
             user = User(
                 id=str(uuid.uuid4()),
@@ -53,33 +58,27 @@ def register():
             storage.save()
             access_token = generate_token(user.id)
 
-            return jsonify({
-                "status": "success",
-                "message": "Registration successful",
-                "statusCode": 201,
-                "data": {
-                    "accessToken": access_token,
-                    "user": {
-                        "userId": user.id,
+            response_data = {
+                "accessToken": access_token,
+                "user": {
+                    "userId": user.id,
                         "username": user.username,
                         "email": user.email,
-                    }
                 }
-            }), 201
+            }
+
+            return ResponseFactory.resource_created(
+                resource = "User",
+                data = response_data
+            ).response
 
         except Exception as e:
             storage.rollback()
-            return jsonify({
-                "status": "Bad request",
-                "message": str(e),
-                "statusCode": 400
-            }), 400
+            return e.errors, e.statusCode
 
-    return jsonify({
-        "status": "Bad request",
-        "message": "Invalid request",
-        "statusCode": 401
-    }), 401
+    raise ResponseFactory.invalid_request(
+        public = "Invalid Request",
+    )
 
 
 @auth.route('/login', methods=['POST'])
@@ -93,11 +92,14 @@ def login():
 
     # Check for missing input
     if not all([email, password]):
-      return jsonify({
-        "status": "Bad Request",
-        "message": "Missing a field",
-        "StatusCode": 400
-      }), 400
+      raise ResponseFactory.validation_error(
+            resource="User",
+            debug={
+                "email": email,
+                "name": name
+            },
+            details = "Missing a required Field"
+        )
 
     # Retrieve user
     user = storage.get_by_email(User, email)
@@ -120,9 +122,7 @@ def login():
           }
       }), 200
     else:
-         return jsonify({
-          "status": "Unauthorized",
-          "message": "Authentication failed",
-          "statusCode": 401
-      }), 401
+         raise ResponseFactory.authentication_error(
+            public = "Authenticate To View This Page"
+         )
 

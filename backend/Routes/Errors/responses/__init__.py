@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-from flask import make_response
-from flask import jsonify
+from flask import make_response, jsonify
 
-class Response:
-    def __new__(self, statusCode, data):
+class CustomResponse:
+    @staticmethod
+    def create(statusCode, data):
         return make_response(jsonify(data), statusCode)
 

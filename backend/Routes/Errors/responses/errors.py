@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from http import HTTPStatus
-from Routes.Errors.Base import BaseExceptionHandler
+from Routes.Errors.Base import BaseExceptionHandler, BaseSuccessHandler
 
-class ErrorResponseFactory:
+class ResponseFactory:
     """ Error responses generation class """
 
     @staticmethod
@@ -35,15 +35,26 @@ class ErrorResponseFactory:
         return cls.create_exception(NotFoundError, public=None, debug=debug, details=details)
 
     @classmethod
-    def user_exists_error(cls, resource=None, debug=None, details=None):
+    def user_exists_error(cls, resource=None, public=None, debug=None, details=None):
         class ConflictError(BaseExceptionHandler):
             statusCode = HTTPStatus.CONFLICT
             default_message = f"{resource} already exists!"
             error_code = "CONFLICT"
-
-        return cls.create_exception(ConflictError, public=details, debug=debug, details=None)
+        return cls.create_exception(ConflictError, public=public, debug=debug, details=details)
 
     @classmethod
-    def resourceCreated(cls, resource, debug=None, details=None):
-        pass
+    def resource_created(cls, resource, data=None, debug=None):
+        class Success(BaseSuccessHandler):
+            statusCode = HTTPStatus.CREATED
+            default_message = f"{resource} Created Successfully"
+            code = "CREATED"
+        return cls.create_exception(Success, public=None, debug=debug, details=data)
+
+    @classmethod
+    def invalid_request(cls, public=None, debug=None, details=None):
+        class Invalid(BaseExceptionHandler):
+            statusCode = HTTPStatus.INVALID_REQUEST
+            default_message = "Invalid Request"
+            error_code = "INVALID"
+        return cls.create_exception(Invalid, public=None, debug=None, details=None)
 
