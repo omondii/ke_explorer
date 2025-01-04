@@ -67,7 +67,7 @@ def register():
                 }
             }
 
-            return ResponseFactory.resource_created(
+            raise ResponseFactory.resource_created(
                 resource = "User",
                 data = response_data
             ).response

@@ -8,6 +8,8 @@ from flask import jsonify
 
 
 class BaseExceptionHandler(Exception):
+    """ An exception response initializer class
+    """
     statusCode = None
     message = None
     error_code = None
@@ -41,6 +43,8 @@ class BaseExceptionHandler(Exception):
 
 
 class BaseSuccessHandler(Exception):
+    """ A Success reponse initializer class
+    """
     statusCode = None
     default_message = None
     code = None
@@ -52,6 +56,8 @@ class BaseSuccessHandler(Exception):
 
     @property
     def response(self):
+        """ Reponse standadizer: Generates responses for 200 status codes
+        """
         return jsonify({
             "status": "success",
             "message": self.default_message,

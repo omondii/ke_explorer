@@ -16,7 +16,8 @@ class ResponseFactory:
             statusCode = HTTPStatus.UNAUTHORIZED
             default_message = "Authentication Failed"
             error_code = "Auth Error"
-        return cls.create_exception(AuthenticationError, public=public, debug=debug, details=details)
+        return cls.create_exception(AuthenticationError, public=public,
+                                    debug=debug, details=details)
 
     @classmethod
     def validation_error(cls, public=None, debug=None, details=None):
@@ -24,7 +25,8 @@ class ResponseFactory:
             statusCode = HTTPStatus.BAD_REQUEST
             default_message = "Invalid Input"
             error_code = "VALIDATION_ERROR"
-        return cls.create_exception(ValidationError, public=None, debug=debug, details=details)
+        return cls.create_exception(ValidationError, public=None, debug=debug,
+                                                               details=details)
 
     @classmethod
     def not_found_error(cls, resource=None, debug=None, details=None):
@@ -40,7 +42,8 @@ class ResponseFactory:
             statusCode = HTTPStatus.CONFLICT
             default_message = f"{resource} already exists!"
             error_code = "CONFLICT"
-        return cls.create_exception(ConflictError, public=public, debug=debug, details=details)
+        return cls.create_exception(ConflictError, public=public, debug=debug,
+                                                                details=details)
 
     @classmethod
     def resource_created(cls, resource, data=None, debug=None):

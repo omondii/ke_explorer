@@ -15,11 +15,11 @@ def error_handler(exception):
             "statusCode": exception.statusCode
         }
 
-        return Response(
-            json.dumps(error_data),
-            status=exception.statusCode,
-            mimetype='application/json'
-        )
+        # return Response(
+        #     json.dumps(error_data),
+        #     status=exception.statusCode,
+        #     mimetype='application/json'
+        # )
 
     current_app.logger.error(f"{type(exception).__name__} - {exception}")
     if current_app.debug:
