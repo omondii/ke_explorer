@@ -7,7 +7,7 @@ from config import Config
 from flask_login import LoginManager
 from flask_jwt_extended import JWTManager
 from datetime import datetime, timedelta, timezone
-from Routes.Errors.errorHandler import error_handler
+from Errors.errorHandler import error_handler
 
 
 app = None

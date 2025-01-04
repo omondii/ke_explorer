@@ -9,7 +9,7 @@ from .utils import generate_token
 import uuid
 from Models.tables import User
 from werkzeug.security import check_password_hash
-from Routes.Errors.responses.errors import ResponseFactory
+from Errors.errors import ResponseFactory
 
 
 @auth.route('/register', methods=['POST'])

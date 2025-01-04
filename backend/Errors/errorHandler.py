@@ -3,8 +3,8 @@ from http import HTTPStatus
 import traceback
 import json
 from flask import current_app, Response
-from Routes.Errors.Base import BaseExceptionHandler
-from Routes.Errors.responses import CustomResponse
+from Errors.Base import BaseExceptionHandler
+from Errors import CustomResponse
 
 
 def error_handler(exception):

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from http import HTTPStatus
-from Routes.Errors.Base import BaseExceptionHandler, BaseSuccessHandler
+from Errors.Base import BaseExceptionHandler, BaseSuccessHandler
 
 class ResponseFactory:
     """ Error responses generation class """

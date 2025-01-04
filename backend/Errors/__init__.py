@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-from flask import make_response, jsonify
-
+# Custom Error builder
 class CustomResponse:
     @staticmethod
     def create(statusCode, data):
